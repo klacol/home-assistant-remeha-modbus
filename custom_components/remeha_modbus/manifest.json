@@ -1,0 +1,15 @@
+{
+  "domain": "remeha_modbus",
+  "name": "Remeha Modbus",
+  "codeowners": ["@klacol"],
+  "config_flow": true,
+  "dependencies": [],
+  "documentation": "https://github.com/klacol/home-assistant-remeha-modbus",
+  "integration_type": "device",
+  "iot_class": "local_polling",
+  "issue_tracker": "https://github.com/klacol/home-assistant-remeha-modbus/issues",
+  "requirements": [
+    "remeha-modbus==0.1.0"
+  ],
+  "version": "0.1.0"
+}

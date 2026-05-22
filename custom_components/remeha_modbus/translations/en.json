@@ -1,0 +1,79 @@
+{
+  "title": "Remeha Modbus",
+  "config": {
+    "step": {
+      "user": {
+        "title": "Remeha Modbus Setup",
+        "description": "Configure the connection to the Remeha gas boiler via the GTW-08 Modbus gateway.",
+        "data": {
+          "name": "Device name in Home Assistant",
+          "host": "IP address of the GTW-08 Modbus gateway (e.g. 192.168.1.100)",
+          "port": "Modbus TCP port (default: 502)",
+          "slave_id": "Modbus slave ID (rotary switch on GTW-08, default: 1)"
+        }
+      }
+    },
+    "abort": {
+      "cannot_connect": "Failed to connect to the Modbus gateway",
+      "single_instance_allowed": "Already configured. Only a single configuration possible."
+    },
+    "error": {
+      "already_configured": "This device is already configured.",
+      "cannot_connect": "Could not connect to the Modbus gateway."
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Remeha Modbus Options",
+        "description": "Update connection settings.",
+        "data": {
+          "host": "IP address of the GTW-08 gateway",
+          "port": "Modbus TCP port",
+          "slave_id": "Modbus slave ID"
+        }
+      }
+    }
+  },
+  "entity": {
+    "sensor": {
+      "power_setpoint": { "name": "Power Setpoint" },
+      "temperature_setpoint": { "name": "Temperature Setpoint" },
+      "algorithm_type": { "name": "Control Algorithm Type" },
+      "heat_demand_type": { "name": "Heat Demand Type" },
+      "power_actual": { "name": "Power Actual" },
+      "flow_temperature": { "name": "Flow Temperature" },
+      "return_temperature": { "name": "Return Temperature" },
+      "producer_status": { "name": "Producer Status" },
+      "appliance_error": { "name": "Appliance Error Code" },
+      "appliance_error_priority": { "name": "Error Priority" },
+      "burner_starts": { "name": "Burner Starts" },
+      "burner_hours": { "name": "Burner Hours" },
+      "service_burning_hours": { "name": "Burning Hours Since Service" },
+      "outside_temperature": { "name": "Outside Temperature" },
+      "season_mode": { "name": "Season Mode" },
+      "flue_gas_temperature": { "name": "Flue Gas Temperature" },
+      "internal_setpoint": { "name": "DHW Setpoint" },
+      "ch_setpoint": { "name": "CH Setpoint" },
+      "water_pressure": { "name": "Water Pressure" },
+      "flow_rate": { "name": "Flow Rate" },
+      "appliance_status": { "name": "Appliance Status" },
+      "appliance_sub_status": { "name": "Appliance Sub-Status" },
+      "ionisation_current": { "name": "Ionisation Current" },
+      "ch_energy_consumption": { "name": "CH Energy Consumption" },
+      "dhw_energy_consumption": { "name": "DHW Energy Consumption" },
+      "cooling_energy_consumption": { "name": "Cooling Energy Consumption" },
+      "ch_enabled": { "name": "Central Heating Enabled" },
+      "dhw_enabled": { "name": "Domestic Hot Water Enabled" },
+      "cooling_enabled": { "name": "Cooling Enabled" },
+      "service_required": { "name": "Service Required" },
+      "service_notification": { "name": "Service Notification" },
+      "service_operating_hours": { "name": "Operating Hours Since Service" },
+      "appliance_on_error": { "name": "Appliance On Error" },
+      "current_error_1": { "name": "Error Code 1" },
+      "error_priority_1": { "name": "Error Priority 1" },
+      "number_of_devices": { "name": "Number of Devices" },
+      "number_of_zones": { "name": "Number of Zones" }
+    }
+  }
+}

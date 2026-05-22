@@ -1,0 +1,79 @@
+{
+  "title": "Remeha Modbus",
+  "config": {
+    "step": {
+      "user": {
+        "title": "Remeha Modbus Einrichtung",
+        "description": "Konfiguriere die Verbindung zum Remeha Gaskessel über das GTW-08 Modbus-Gateway.",
+        "data": {
+          "name": "Name des Geräts in Home Assistant",
+          "host": "IP-Adresse des GTW-08 Modbus-Gateways (z.B. 192.168.1.100)",
+          "port": "Modbus TCP Port (Standard: 502)",
+          "slave_id": "Modbus Slave-ID (Drehschalter am GTW-08, Standard: 1)"
+        }
+      }
+    },
+    "abort": {
+      "cannot_connect": "Verbindung zum Modbus-Gateway fehlgeschlagen",
+      "single_instance_allowed": "Bereits konfiguriert. Nur eine einzige Konfiguration möglich."
+    },
+    "error": {
+      "already_configured": "Dieses Gerät ist bereits konfiguriert.",
+      "cannot_connect": "Verbindung zum Modbus-Gateway konnte nicht hergestellt werden."
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Remeha Modbus Optionen",
+        "description": "Verbindungseinstellungen ändern.",
+        "data": {
+          "host": "IP-Adresse des GTW-08 Gateways",
+          "port": "Modbus TCP Port",
+          "slave_id": "Modbus Slave-ID"
+        }
+      }
+    }
+  },
+  "entity": {
+    "sensor": {
+      "power_setpoint": { "name": "Leistungssollwert" },
+      "temperature_setpoint": { "name": "Temperatursollwert" },
+      "algorithm_type": { "name": "Art der Regelung" },
+      "heat_demand_type": { "name": "Art der Heizanforderung" },
+      "power_actual": { "name": "Ist-Leistung" },
+      "flow_temperature": { "name": "Vorlauftemperatur" },
+      "return_temperature": { "name": "Rücklauftemperatur" },
+      "producer_status": { "name": "Erzeuger-Status" },
+      "appliance_error": { "name": "Fehlercode Gerät" },
+      "appliance_error_priority": { "name": "Fehlerstufe" },
+      "burner_starts": { "name": "Brennerstarts" },
+      "burner_hours": { "name": "Brennerstunden" },
+      "service_burning_hours": { "name": "Brennstunden seit Wartung" },
+      "outside_temperature": { "name": "Außentemperatur" },
+      "season_mode": { "name": "Jahreszeitenmodus" },
+      "flue_gas_temperature": { "name": "Abgastemperatur" },
+      "internal_setpoint": { "name": "Sollwert Trinkwarmwasser" },
+      "ch_setpoint": { "name": "Heizungssollwert" },
+      "water_pressure": { "name": "Wasserdruck" },
+      "flow_rate": { "name": "Durchfluss" },
+      "appliance_status": { "name": "Gerätestatus" },
+      "appliance_sub_status": { "name": "Geräte-Substatus" },
+      "ionisation_current": { "name": "Flammenstrom" },
+      "ch_energy_consumption": { "name": "Energieverbrauch Heizung" },
+      "dhw_energy_consumption": { "name": "Energieverbrauch Warmwasser" },
+      "cooling_energy_consumption": { "name": "Energieverbrauch Kühlung" },
+      "ch_enabled": { "name": "Heizung aktiv" },
+      "dhw_enabled": { "name": "Warmwasser aktiv" },
+      "cooling_enabled": { "name": "Kühlung aktiv" },
+      "service_required": { "name": "Wartung erforderlich" },
+      "service_notification": { "name": "Wartungsmeldung" },
+      "service_operating_hours": { "name": "Betriebsstunden seit Wartung" },
+      "appliance_on_error": { "name": "Fehler am Gerät" },
+      "current_error_1": { "name": "Fehlercode 1" },
+      "error_priority_1": { "name": "Fehlerstufe 1" },
+      "number_of_devices": { "name": "Anzahl Platinen" },
+      "number_of_zones": { "name": "Anzahl Kreise" }
+    }
+  }
+}

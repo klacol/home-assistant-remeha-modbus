@@ -1,0 +1,7 @@
+{
+  "name": "Remeha Modbus",
+  "render_readme": true,
+  "domains": ["sensor"],
+  "homeassistant": "2024.1.0",
+  "iot_class": "local_polling"
+}
