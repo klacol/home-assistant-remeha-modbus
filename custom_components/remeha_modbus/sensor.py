@@ -104,12 +104,8 @@ def _derive_sensor_attrs(register: RegisterDefinition) -> dict:
     elif any(keyword in register.name for keyword in statistik_keywords):
         entity_category = EntityCategory.DIAGNOSTIC
 
-    # Pretty name from register name
-    name = register.name.replace("_", " ").title()
-
     return {
         "key": register.name,
-        "name": name,
         "unit": unit,
         "state_class": state_class,
         "device_class": device_class,
@@ -164,7 +160,6 @@ async def async_setup_entry(
                 port=port,
                 slave_id=slave_id,
                 sensor_key=sensor_def["key"],
-                sensor_name=sensor_def["name"],
                 unit=sensor_def["unit"],
                 state_class=sensor_def["state_class"],
                 device_class=sensor_def["device_class"],
@@ -189,7 +184,6 @@ async def async_setup_entry(
                         port=port,
                         slave_id=slave_id,
                         sensor_key=sensor_def["key"],
-                        sensor_name=sensor_def["name"],
                         unit=sensor_def["unit"],
                         state_class=sensor_def["state_class"],
                         device_class=sensor_def["device_class"],
@@ -214,7 +208,6 @@ class RemehaModbusSensor(CoordinatorEntity, SensorEntity):
         port: int,
         slave_id: int,
         sensor_key: str,
-        sensor_name: str,
         unit: str | None,
         state_class: SensorStateClass | None,
         device_class: SensorDeviceClass | None,
