@@ -76,14 +76,32 @@ def _derive_sensor_attrs(register: RegisterDefinition) -> dict:
     if register.name in _TOTAL_INCREASING_KEYS:
         state_class = SensorStateClass.TOTAL_INCREASING
 
+    # === STAMMDATEN (Diagnostic) ===
+    # Technical info that rarely changes
+    stammdaten_keywords = [
+        "firmware", "serial", "model", "number_of_", "device_id",
+        "product_", "version", "configuration"
+    ]
+    
+    # === STATISTIKEN (Diagnostic) ===
+    # Counters and historical data
+    statistik_keywords = [
+        "burner_starts", "burner_hours", "pump_starts", "pump_hours",
+        "energy_consumption", "operating_hours", "total_", "counter"
+    ]
+    
     # Enum, status, and error registers are diagnostics
     if register.data_type in (DataType.ENUM8, DataType.BOOL8):
         entity_category = EntityCategory.DIAGNOSTIC
         state_class = None
         device_class = None
-    elif "error" in register.name or "status" in register.name:
+    elif "error" in register.name or "status" in register.name or "state" in register.name:
         entity_category = EntityCategory.DIAGNOSTIC
-    elif register.name.startswith("number_of_"):
+    # Stammdaten
+    elif any(keyword in register.name for keyword in stammdaten_keywords):
+        entity_category = EntityCategory.DIAGNOSTIC
+    # Statistiken (Zähler als Diagnostic, aber behalten state_class für Energy Dashboard)
+    elif any(keyword in register.name for keyword in statistik_keywords):
         entity_category = EntityCategory.DIAGNOSTIC
 
     # Pretty name from register name
