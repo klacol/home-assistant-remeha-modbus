@@ -17,335 +17,105 @@ from homeassistant.const import (
     PERCENTAGE,
 )
 
+from remeha_modbus import NOT_SUPPORTED
+from remeha_modbus.registers import (
+    ALL_REGISTERS,
+    DataType,
+    RegisterDefinition,
+    get_zone_registers,
+)
+
 from .const import DOMAIN, CONF_NAME, CONF_HOST, CONF_PORT, CONF_SLAVE_ID
 
 _LOGGER = logging.getLogger(__name__)
 
 
-SENSOR_DEFINITIONS = [
-    # Main Controller Monitoring
-    {
-        "key": "power_setpoint",
-        "name": "Power Setpoint",
-        "unit": PERCENTAGE,
-        "state_class": SensorStateClass.MEASUREMENT,
-        "device_class": SensorDeviceClass.POWER_FACTOR,
-        "entity_category": None,
-    },
-    {
-        "key": "temperature_setpoint",
-        "name": "Temperature Setpoint",
-        "unit": UnitOfTemperature.CELSIUS,
-        "state_class": SensorStateClass.MEASUREMENT,
-        "device_class": SensorDeviceClass.TEMPERATURE,
-        "entity_category": None,
-    },
-    {
-        "key": "algorithm_type",
-        "name": "Control Algorithm Type",
-        "unit": None,
-        "state_class": None,
-        "device_class": None,
-        "entity_category": EntityCategory.DIAGNOSTIC,
-    },
-    {
-        "key": "heat_demand_type",
-        "name": "Heat Demand Type",
-        "unit": None,
-        "state_class": None,
-        "device_class": None,
-        "entity_category": EntityCategory.DIAGNOSTIC,
-    },
-    {
-        "key": "power_actual",
-        "name": "Power Actual",
-        "unit": PERCENTAGE,
-        "state_class": SensorStateClass.MEASUREMENT,
-        "device_class": SensorDeviceClass.POWER_FACTOR,
-        "entity_category": None,
-    },
-    {
-        "key": "flow_temperature",
-        "name": "Flow Temperature",
-        "unit": UnitOfTemperature.CELSIUS,
-        "state_class": SensorStateClass.MEASUREMENT,
-        "device_class": SensorDeviceClass.TEMPERATURE,
-        "entity_category": None,
-    },
-    {
-        "key": "return_temperature",
-        "name": "Return Temperature",
-        "unit": UnitOfTemperature.CELSIUS,
-        "state_class": SensorStateClass.MEASUREMENT,
-        "device_class": SensorDeviceClass.TEMPERATURE,
-        "entity_category": None,
-    },
-    {
-        "key": "producer_status",
-        "name": "Producer Status",
-        "unit": None,
-        "state_class": None,
-        "device_class": None,
-        "entity_category": EntityCategory.DIAGNOSTIC,
-    },
-    {
-        "key": "appliance_error",
-        "name": "Appliance Error Code",
-        "unit": None,
-        "state_class": None,
-        "device_class": None,
-        "entity_category": EntityCategory.DIAGNOSTIC,
-    },
-    {
-        "key": "appliance_error_priority",
-        "name": "Error Priority",
-        "unit": None,
-        "state_class": None,
-        "device_class": None,
-        "entity_category": EntityCategory.DIAGNOSTIC,
-    },
-    {
-        "key": "burner_starts",
-        "name": "Burner Starts",
-        "unit": None,
-        "state_class": SensorStateClass.TOTAL_INCREASING,
-        "device_class": None,
-        "entity_category": None,
-    },
-    {
-        "key": "burner_hours",
-        "name": "Burner Hours",
-        "unit": UnitOfTime.HOURS,
-        "state_class": SensorStateClass.TOTAL_INCREASING,
-        "device_class": SensorDeviceClass.DURATION,
-        "entity_category": None,
-    },
-    {
-        "key": "service_burning_hours",
-        "name": "Burning Hours Since Service",
-        "unit": UnitOfTime.HOURS,
-        "state_class": SensorStateClass.MEASUREMENT,
-        "device_class": SensorDeviceClass.DURATION,
-        "entity_category": EntityCategory.DIAGNOSTIC,
-    },
-    # Appliance Registers
-    {
-        "key": "outside_temperature",
-        "name": "Outside Temperature",
-        "unit": UnitOfTemperature.CELSIUS,
-        "state_class": SensorStateClass.MEASUREMENT,
-        "device_class": SensorDeviceClass.TEMPERATURE,
-        "entity_category": None,
-    },
-    {
-        "key": "season_mode",
-        "name": "Season Mode",
-        "unit": None,
-        "state_class": None,
-        "device_class": None,
-        "entity_category": EntityCategory.DIAGNOSTIC,
-    },
-    {
-        "key": "flue_gas_temperature",
-        "name": "Flue Gas Temperature",
-        "unit": UnitOfTemperature.CELSIUS,
-        "state_class": SensorStateClass.MEASUREMENT,
-        "device_class": SensorDeviceClass.TEMPERATURE,
-        "entity_category": None,
-    },
-    {
-        "key": "internal_setpoint",
-        "name": "DHW Setpoint",
-        "unit": UnitOfTemperature.CELSIUS,
-        "state_class": SensorStateClass.MEASUREMENT,
-        "device_class": SensorDeviceClass.TEMPERATURE,
-        "entity_category": None,
-    },
-    {
-        "key": "ch_setpoint",
-        "name": "CH Setpoint",
-        "unit": UnitOfTemperature.CELSIUS,
-        "state_class": SensorStateClass.MEASUREMENT,
-        "device_class": SensorDeviceClass.TEMPERATURE,
-        "entity_category": None,
-    },
-    {
-        "key": "water_pressure",
-        "name": "Water Pressure",
-        "unit": UnitOfPressure.BAR,
-        "state_class": SensorStateClass.MEASUREMENT,
-        "device_class": SensorDeviceClass.PRESSURE,
-        "entity_category": None,
-    },
-    {
-        "key": "flow_rate",
-        "name": "Flow Rate",
-        "unit": "l/min",
-        "state_class": SensorStateClass.MEASUREMENT,
-        "device_class": None,
-        "entity_category": None,
-    },
-    {
-        "key": "appliance_status",
-        "name": "Appliance Status",
-        "unit": None,
-        "state_class": None,
-        "device_class": None,
-        "entity_category": EntityCategory.DIAGNOSTIC,
-    },
-    {
-        "key": "appliance_sub_status",
-        "name": "Appliance Sub-Status",
-        "unit": None,
-        "state_class": None,
-        "device_class": None,
-        "entity_category": EntityCategory.DIAGNOSTIC,
-    },
-    {
-        "key": "ionisation_current",
-        "name": "Ionisation Current",
-        "unit": "µA",
-        "state_class": SensorStateClass.MEASUREMENT,
-        "device_class": None,
-        "entity_category": EntityCategory.DIAGNOSTIC,
-    },
-    {
-        "key": "ch_energy_consumption",
-        "name": "CH Energy Consumption",
-        "unit": UnitOfEnergy.KILO_WATT_HOUR,
-        "state_class": SensorStateClass.TOTAL_INCREASING,
-        "device_class": SensorDeviceClass.ENERGY,
-        "entity_category": None,
-    },
-    {
-        "key": "dhw_energy_consumption",
-        "name": "DHW Energy Consumption",
-        "unit": UnitOfEnergy.KILO_WATT_HOUR,
-        "state_class": SensorStateClass.TOTAL_INCREASING,
-        "device_class": SensorDeviceClass.ENERGY,
-        "entity_category": None,
-    },
-    {
-        "key": "cooling_energy_consumption",
-        "name": "Cooling Energy Consumption",
-        "unit": UnitOfEnergy.KILO_WATT_HOUR,
-        "state_class": SensorStateClass.TOTAL_INCREASING,
-        "device_class": SensorDeviceClass.ENERGY,
-        "entity_category": None,
-    },
-    {
-        "key": "ch_enabled",
-        "name": "Central Heating Enabled",
-        "unit": None,
-        "state_class": None,
-        "device_class": None,
-        "entity_category": EntityCategory.DIAGNOSTIC,
-    },
-    {
-        "key": "dhw_enabled",
-        "name": "Domestic Hot Water Enabled",
-        "unit": None,
-        "state_class": None,
-        "device_class": None,
-        "entity_category": EntityCategory.DIAGNOSTIC,
-    },
-    {
-        "key": "cooling_enabled",
-        "name": "Cooling Enabled",
-        "unit": None,
-        "state_class": None,
-        "device_class": None,
-        "entity_category": EntityCategory.DIAGNOSTIC,
-    },
-    # Maintenance Registers
-    {
-        "key": "service_required",
-        "name": "Service Required",
-        "unit": None,
-        "state_class": None,
-        "device_class": None,
-        "entity_category": EntityCategory.DIAGNOSTIC,
-    },
-    {
-        "key": "service_notification",
-        "name": "Service Notification",
-        "unit": None,
-        "state_class": None,
-        "device_class": None,
-        "entity_category": EntityCategory.DIAGNOSTIC,
-    },
-    {
-        "key": "service_operating_hours",
-        "name": "Operating Hours Since Service",
-        "unit": UnitOfTime.HOURS,
-        "state_class": SensorStateClass.MEASUREMENT,
-        "device_class": SensorDeviceClass.DURATION,
-        "entity_category": EntityCategory.DIAGNOSTIC,
-    },
-    {
-        "key": "appliance_on_error",
-        "name": "Appliance On Error",
-        "unit": None,
-        "state_class": None,
-        "device_class": None,
-        "entity_category": EntityCategory.DIAGNOSTIC,
-    },
-    {
-        "key": "current_error_1",
-        "name": "Error Code 1",
-        "unit": None,
-        "state_class": None,
-        "device_class": None,
-        "entity_category": EntityCategory.DIAGNOSTIC,
-    },
-    {
-        "key": "error_priority_1",
-        "name": "Error Priority 1",
-        "unit": None,
-        "state_class": None,
-        "device_class": None,
-        "entity_category": EntityCategory.DIAGNOSTIC,
-    },
-    # System Discovery
-    {
-        "key": "number_of_devices",
-        "name": "Number of Devices",
-        "unit": None,
-        "state_class": None,
-        "device_class": None,
-        "entity_category": EntityCategory.DIAGNOSTIC,
-    },
-    {
-        "key": "number_of_zones",
-        "name": "Number of Zones",
-        "unit": None,
-        "state_class": None,
-        "device_class": None,
-        "entity_category": EntityCategory.DIAGNOSTIC,
-    },
-]
+# Mapping from library unit strings to HA unit constants
+_UNIT_MAP = {
+    "°C": UnitOfTemperature.CELSIUS,
+    "bar": UnitOfPressure.BAR,
+    "h": UnitOfTime.HOURS,
+    "kWh": UnitOfEnergy.KILO_WATT_HOUR,
+    "%": PERCENTAGE,
+}
+
+# Registers that represent total counters (state_class = TOTAL_INCREASING)
+_TOTAL_INCREASING_KEYS = {
+    "burner_starts", "burner_hours",
+    "ch_energy_consumption", "dhw_energy_consumption", "cooling_energy_consumption",
+}
 
 
-def _create_sensors(device_name: str, host: str, port: int, slave_id: int, hass):
-    """Create sensor entities for one Remeha device."""
-    entities = []
-    for sensor_def in SENSOR_DEFINITIONS:
-        entities.append(
-            RemehaModbusSensor(
-                coordinator=hass.data[DOMAIN]["coordinator"],
-                device_name=device_name,
-                host=host,
-                port=port,
-                slave_id=slave_id,
-                sensor_key=sensor_def["key"],
-                sensor_name=sensor_def["name"],
-                unit=sensor_def["unit"],
-                state_class=sensor_def["state_class"],
-                device_class=sensor_def["device_class"],
-                entity_category=sensor_def["entity_category"],
-            )
-        )
-    return entities
+def _derive_sensor_attrs(register: RegisterDefinition) -> dict:
+    """Derive HA sensor attributes from a register definition."""
+    unit = _UNIT_MAP.get(register.unit, register.unit or None)
+    device_class = None
+    state_class = None
+    entity_category = None
+
+    # Determine device_class from unit
+    if register.unit == "°C":
+        device_class = SensorDeviceClass.TEMPERATURE
+        state_class = SensorStateClass.MEASUREMENT
+    elif register.unit == "bar":
+        device_class = SensorDeviceClass.PRESSURE
+        state_class = SensorStateClass.MEASUREMENT
+    elif register.unit == "kWh":
+        device_class = SensorDeviceClass.ENERGY
+        state_class = SensorStateClass.TOTAL_INCREASING
+    elif register.unit == "h":
+        device_class = SensorDeviceClass.DURATION
+        state_class = SensorStateClass.MEASUREMENT
+    elif register.unit == "%":
+        device_class = SensorDeviceClass.POWER_FACTOR
+        state_class = SensorStateClass.MEASUREMENT
+    elif register.unit == "l/min":
+        state_class = SensorStateClass.MEASUREMENT
+
+    # Override for known counters
+    if register.name in _TOTAL_INCREASING_KEYS:
+        state_class = SensorStateClass.TOTAL_INCREASING
+
+    # Enum, status, and error registers are diagnostics
+    if register.data_type in (DataType.ENUM8, DataType.BOOL8):
+        entity_category = EntityCategory.DIAGNOSTIC
+        state_class = None
+        device_class = None
+    elif "error" in register.name or "status" in register.name:
+        entity_category = EntityCategory.DIAGNOSTIC
+    elif register.name.startswith("number_of_"):
+        entity_category = EntityCategory.DIAGNOSTIC
+
+    # Pretty name from register name
+    name = register.name.replace("_", " ").title()
+
+    return {
+        "key": register.name,
+        "name": name,
+        "unit": unit,
+        "state_class": state_class,
+        "device_class": device_class,
+        "entity_category": entity_category,
+    }
+
+
+def _build_sensor_definitions() -> list[dict]:
+    """Build sensor definitions from the library's ALL_REGISTERS."""
+    definitions = []
+    for register in ALL_REGISTERS:
+        definitions.append(_derive_sensor_attrs(register))
+    return definitions
+
+
+SENSOR_DEFINITIONS = _build_sensor_definitions()
+
+
+def _build_zone_sensor_definitions(zone_number: int) -> list[dict]:
+    """Build sensor definitions for a specific zone."""
+    definitions = []
+    for register in get_zone_registers(zone_number):
+        definitions.append(_derive_sensor_attrs(register))
+    return definitions
 
 
 async def async_setup_entry(
@@ -360,11 +130,57 @@ async def async_setup_entry(
     device_name = config[CONF_NAME]
     host = config[CONF_HOST]
     port = config.get(CONF_PORT, 502)
-    slave_id = config.get(CONF_SLAVE_ID, 1)
+    slave_id = config.get(CONF_SLAVE_ID, 100)
 
-    async_add_entities(
-        _create_sensors(device_name, host, port, slave_id, hass)
-    )
+    coordinator = hass.data[DOMAIN]["coordinator"]
+    model = hass.data[DOMAIN].get("model")
+
+    # Create main sensors from ALL_REGISTERS
+    entities = []
+    for sensor_def in SENSOR_DEFINITIONS:
+        entities.append(
+            RemehaModbusSensor(
+                coordinator=coordinator,
+                device_name=device_name,
+                host=host,
+                port=port,
+                slave_id=slave_id,
+                sensor_key=sensor_def["key"],
+                sensor_name=sensor_def["name"],
+                unit=sensor_def["unit"],
+                state_class=sensor_def["state_class"],
+                device_class=sensor_def["device_class"],
+                entity_category=sensor_def["entity_category"],
+                model=model,
+            )
+        )
+
+    # Create zone sensors if zones were discovered
+    data = coordinator.data or {}
+    device_data = data.get(device_name, {})
+    num_zones = device_data.get("number_of_zones") or 0
+    if isinstance(num_zones, int) and num_zones > 0:
+        for zone_num in range(1, min(num_zones, 12) + 1):
+            zone_defs = _build_zone_sensor_definitions(zone_num)
+            for sensor_def in zone_defs:
+                entities.append(
+                    RemehaModbusSensor(
+                        coordinator=coordinator,
+                        device_name=device_name,
+                        host=host,
+                        port=port,
+                        slave_id=slave_id,
+                        sensor_key=sensor_def["key"],
+                        sensor_name=sensor_def["name"],
+                        unit=sensor_def["unit"],
+                        state_class=sensor_def["state_class"],
+                        device_class=sensor_def["device_class"],
+                        entity_category=sensor_def["entity_category"],
+                        model=model,
+                    )
+                )
+
+    async_add_entities(entities)
 
 
 class RemehaModbusSensor(CoordinatorEntity, SensorEntity):
@@ -385,6 +201,7 @@ class RemehaModbusSensor(CoordinatorEntity, SensorEntity):
         state_class: SensorStateClass | None,
         device_class: SensorDeviceClass | None,
         entity_category: EntityCategory | None,
+        model: str | None = None,
     ):
         """Initialize the sensor."""
         super().__init__(coordinator)
@@ -393,6 +210,7 @@ class RemehaModbusSensor(CoordinatorEntity, SensorEntity):
         self._port = port
         self._slave_id = slave_id
         self._sensor_key = sensor_key
+        self._model = model
         self._attr_translation_key = sensor_key
         self._attr_name = sensor_name
         self._attr_native_unit_of_measurement = unit
@@ -408,7 +226,7 @@ class RemehaModbusSensor(CoordinatorEntity, SensorEntity):
             "identifiers": {(DOMAIN, self._device_name)},
             "name": self._device_name,
             "manufacturer": "Remeha",
-            "model": "Quinta Ace",
+            "model": self._model or "Unknown",
             "configuration_url": f"http://{self._host}",
         }
 
@@ -425,4 +243,7 @@ class RemehaModbusSensor(CoordinatorEntity, SensorEntity):
         device_data = self.coordinator.data.get(self._device_name)
         if device_data is None:
             return None
-        return device_data.get(self._sensor_key)
+        value = device_data.get(self._sensor_key)
+        if isinstance(value, type(NOT_SUPPORTED)):
+            return None
+        return value

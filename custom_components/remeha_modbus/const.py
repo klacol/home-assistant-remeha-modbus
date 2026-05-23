@@ -10,4 +10,4 @@ CONF_PORT = "port"
 CONF_SLAVE_ID = "slave_id"
 
 DEFAULT_PORT = 502
-DEFAULT_SLAVE_ID = 1
+DEFAULT_SLAVE_ID = 100  # GTW-08 default rotary switch position

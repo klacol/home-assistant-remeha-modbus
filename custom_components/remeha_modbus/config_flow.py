@@ -108,8 +108,8 @@ class RemehaModbusConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                 {
                     vol.Required(CONF_NAME, default=user_input.get(CONF_NAME)): str,
                     vol.Required(CONF_HOST, default=user_input.get(CONF_HOST)): str,
-                    vol.Required(CONF_PORT, default=user_input.get(CONF_PORT)): int,
-                    vol.Required(CONF_SLAVE_ID, default=user_input.get(CONF_SLAVE_ID)): int,
+                    vol.Optional(CONF_PORT, default=user_input.get(CONF_PORT)): int,
+                    vol.Optional(CONF_SLAVE_ID, default=user_input.get(CONF_SLAVE_ID)): int,
                 }
             ),
             errors=self._errors,
