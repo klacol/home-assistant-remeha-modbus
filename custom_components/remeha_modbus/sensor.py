@@ -230,7 +230,7 @@ class RemehaModbusSensor(CoordinatorEntity, SensorEntity):
         self._sensor_key = sensor_key
         self._model = model
         self._attr_translation_key = sensor_key
-        self._attr_name = sensor_name
+        # Don't set _attr_name - let translation_key handle the name
         self._attr_native_unit_of_measurement = unit
         self._attr_state_class = state_class
         self._attr_device_class = device_class
