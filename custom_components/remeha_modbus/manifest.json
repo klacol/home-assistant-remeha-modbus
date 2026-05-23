@@ -9,7 +9,7 @@
   "iot_class": "local_polling",
   "issue_tracker": "https://github.com/klacol/home-assistant-remeha-modbus/issues",
   "requirements": [
-    "remeha-modbus>=0.1.0"
+    "remeha-modbus>=0.2.0"
   ],
   "version": "0.2.0"
 }

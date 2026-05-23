@@ -29,6 +29,81 @@ from .const import DOMAIN, CONF_NAME, CONF_HOST, CONF_PORT, CONF_SLAVE_ID
 
 _LOGGER = logging.getLogger(__name__)
 
+# Lookup: register name -> RegisterDefinition (for bitfield registers only)
+_BITFIELD_REGISTERS: dict[str, RegisterDefinition] = {
+    reg.name: reg for reg in ALL_REGISTERS if reg.bit_definitions
+}
+
+# Translations for bitfield keys per language
+_BITFIELD_LABELS: dict[str, dict[str, str]] = {
+    "de": {
+        # producer_status
+        "pump_active": "Pumpe aktiv",
+        "power_engine_active": "Leistungsmotor aktiv",
+        "dhw_generating": "TWW-Erzeugung",
+        "ch_possible": "Heizung möglich",
+        "dhw_possible": "TWW möglich",
+        "cooling_possible": "Kühlung möglich",
+        "electric_possible": "Elektrisch möglich",
+        "lockout_present": "Verriegelung aktiv",
+        # producer_request
+        "frost_protection": "Frostschutz",
+        "frost_protection_pump_only": "Frostschutz nur Pumpe",
+        "chimney_sweep": "Schornsteinfeger",
+        "maintenance_request": "Wartungsanforderung",
+        # appliance_status_1
+        "flame": "Flamme",
+        "heat_pump": "Wärmepumpe",
+        "electric_backup": "Elektr. Zusatzerzeuger",
+        "electric_backup_2": "Elektr. Zusatzerzeuger 2",
+        "dhw_electric_backup": "TWW Elektr. Zusatzerzeuger",
+        "maintenance_required": "Wartung erforderlich",
+        "reset_required": "Reset erforderlich",
+        "water_pressure_low": "Wasserdruck gering",
+        # appliance_status_2
+        "pump": "Pumpe",
+        "three_way_valve_open": "3-Wege-Ventil offen",
+        "three_way_valve": "3-Wege-Ventil",
+        "three_way_valve_closed": "3-Wege-Ventil geschlossen",
+        "dhw_active": "TWW aktiv",
+        "ch_active": "Heizung aktiv",
+        "cooling_active": "Kühlung aktiv",
+    },
+    "en": {
+        # producer_status
+        "pump_active": "Pump active",
+        "power_engine_active": "Power engine active",
+        "dhw_generating": "DHW generating",
+        "ch_possible": "CH possible",
+        "dhw_possible": "DHW possible",
+        "cooling_possible": "Cooling possible",
+        "electric_possible": "Electric possible",
+        "lockout_present": "Lockout present",
+        # producer_request
+        "frost_protection": "Frost protection",
+        "frost_protection_pump_only": "Frost protection pump only",
+        "chimney_sweep": "Chimney sweep",
+        "maintenance_request": "Maintenance request",
+        # appliance_status_1
+        "flame": "Flame",
+        "heat_pump": "Heat pump",
+        "electric_backup": "Electric backup",
+        "electric_backup_2": "Electric backup 2",
+        "dhw_electric_backup": "DHW electric backup",
+        "maintenance_required": "Maintenance required",
+        "reset_required": "Reset required",
+        "water_pressure_low": "Water pressure low",
+        # appliance_status_2
+        "pump": "Pump",
+        "three_way_valve_open": "3-way valve open",
+        "three_way_valve": "3-way valve",
+        "three_way_valve_closed": "3-way valve closed",
+        "dhw_active": "DHW active",
+        "ch_active": "CH active",
+        "cooling_active": "Cooling active",
+    },
+}
+
 
 # Mapping from library unit strings to HA unit constants
 _UNIT_MAP = {
@@ -90,8 +165,13 @@ def _derive_sensor_attrs(register: RegisterDefinition) -> dict:
         "energy_consumption", "operating_hours", "total_", "counter"
     ]
     
+    # Bitfield registers return strings, no numeric class
+    if register.bit_definitions:
+        entity_category = EntityCategory.DIAGNOSTIC
+        state_class = None
+        device_class = None
     # Enum, status, and error registers are diagnostics
-    if register.data_type in (DataType.ENUM8, DataType.BOOL8):
+    elif register.data_type in (DataType.ENUM8, DataType.BOOL8):
         entity_category = EntityCategory.DIAGNOSTIC
         state_class = None
         device_class = None
@@ -266,4 +346,14 @@ class RemehaModbusSensor(CoordinatorEntity, SensorEntity):
         value = device_data.get(self._sensor_key)
         if isinstance(value, type(NOT_SUPPORTED)):
             return None
+        # Decode bitfield registers to translated string
+        register = _BITFIELD_REGISTERS.get(self._sensor_key)
+        if register and isinstance(value, int):
+            lang = self.hass.config.language or "en"
+            labels = _BITFIELD_LABELS.get(lang, _BITFIELD_LABELS["en"])
+            active = []
+            for bit, key in register.bit_definitions.items():
+                if value & (1 << bit):
+                    active.append(labels.get(key, key))
+            return ", ".join(active) if active else None
         return value
