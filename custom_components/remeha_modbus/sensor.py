@@ -189,6 +189,7 @@ async def async_setup_entry(
                         device_class=sensor_def["device_class"],
                         entity_category=sensor_def["entity_category"],
                         model=model,
+                        zone_number=zone_num,
                     )
                 )
 
@@ -213,6 +214,7 @@ class RemehaModbusSensor(CoordinatorEntity, SensorEntity):
         device_class: SensorDeviceClass | None,
         entity_category: EntityCategory | None,
         model: str | None = None,
+        zone_number: int | None = None,
     ):
         """Initialize the sensor."""
         super().__init__(coordinator)
@@ -222,8 +224,15 @@ class RemehaModbusSensor(CoordinatorEntity, SensorEntity):
         self._slave_id = slave_id
         self._sensor_key = sensor_key
         self._model = model
-        self._attr_translation_key = sensor_key
-        # Don't set _attr_name - let translation_key handle the name
+        # For zone sensors, strip the "zoneN_" prefix from translation_key
+        # and use translation_placeholders to inject the zone number
+        if zone_number is not None:
+            import re
+            base_key = re.sub(r'^zone\d+_', '', sensor_key)
+            self._attr_translation_key = base_key
+            self._attr_translation_placeholders = {"zone": str(zone_number)}
+        else:
+            self._attr_translation_key = sensor_key
         self._attr_native_unit_of_measurement = unit
         self._attr_state_class = state_class
         self._attr_device_class = device_class

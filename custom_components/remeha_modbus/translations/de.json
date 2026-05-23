@@ -116,13 +116,13 @@
       "config_table_version": { "name": "Konfigurationstabelle Version" },
       "hardware_version": { "name": "Hardwareversion" },
       "article_number": { "name": "Artikelnummer" },
-      "zone_type": { "name": "Kreis-Typ" },
-      "zone_function": { "name": "Kreis-Funktion" },
-      "zone_flow_setpoint": { "name": "Kreis Vorlaufsollwert" },
-      "zone_mode": { "name": "Kreis-Modus" },
-      "zone_room_setpoint_1": { "name": "Kreis Raumsollwert 1" },
-      "zone_dhw_comfort_setpoint": { "name": "Kreis TWW Komfortsollwert" },
-      "zone_dhw_reduced_setpoint": { "name": "Kreis TWW Reduziertsollwert" }
+      "zone_type": { "name": "Kreis {zone} Typ" },
+      "zone_function": { "name": "Kreis {zone} Funktion" },
+      "zone_flow_setpoint": { "name": "Kreis {zone} Vorlaufsollwert" },
+      "zone_mode": { "name": "Kreis {zone} Modus" },
+      "zone_room_setpoint_1": { "name": "Kreis {zone} Raumsollwert" },
+      "zone_dhw_comfort_setpoint": { "name": "Kreis {zone} TWW Komfortsollwert" },
+      "zone_dhw_reduced_setpoint": { "name": "Kreis {zone} TWW Reduziertsollwert" }
     }
   }
 }

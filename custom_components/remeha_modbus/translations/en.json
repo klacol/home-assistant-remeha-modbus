@@ -116,13 +116,13 @@
       "config_table_version": { "name": "Configuration Table Version" },
       "hardware_version": { "name": "Hardware Version" },
       "article_number": { "name": "Article Number" },
-      "zone_type": { "name": "Zone Type" },
-      "zone_function": { "name": "Zone Function" },
-      "zone_flow_setpoint": { "name": "Zone Flow Setpoint" },
-      "zone_mode": { "name": "Zone Mode" },
-      "zone_room_setpoint_1": { "name": "Zone Room Setpoint 1" },
-      "zone_dhw_comfort_setpoint": { "name": "Zone DHW Comfort Setpoint" },
-      "zone_dhw_reduced_setpoint": { "name": "Zone DHW Reduced Setpoint" }
+      "zone_type": { "name": "Zone {zone} Type" },
+      "zone_function": { "name": "Zone {zone} Function" },
+      "zone_flow_setpoint": { "name": "Zone {zone} Flow Setpoint" },
+      "zone_mode": { "name": "Zone {zone} Mode" },
+      "zone_room_setpoint_1": { "name": "Zone {zone} Room Setpoint" },
+      "zone_dhw_comfort_setpoint": { "name": "Zone {zone} DHW Comfort Setpoint" },
+      "zone_dhw_reduced_setpoint": { "name": "Zone {zone} DHW Reduced Setpoint" }
     }
   }
 }
