@@ -4,6 +4,12 @@
 
 Custom Home Assistant integration for **Remeha Quinta Ace** gas boilers via the **GTW-08 Modbus gateway**.
 
+> [!NOTE]
+> **Alternative Integration Available:**  
+> There is a more actively developed integration at [houthacker/remeha-modbus](https://github.com/houthacker/remeha-modbus) that may offer more features and better support.
+> 
+> This integration was created mainly for my personal use and is only maintained sporadically.
+
 ## Features
 
 - Reads all relevant sensor data via Modbus TCP
